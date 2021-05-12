@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/gogs/git-module"
 
@@ -24,7 +25,9 @@ func serveData(c *context.Context, name string, data []byte) error {
 	}
 	c.Resp.Header().Set("Last-Modified", commit.Committer.When.Format(http.TimeFormat))
 
-	if !tool.IsTextFile(data) {
+	if strings.Contains(string(data), "</svg>") {
+		c.Resp.Header().Set("Content-Type", "image/svg+xml")
+	} else if !tool.IsTextFile(data) {
 		if !tool.IsImageFile(data) {
 			c.Resp.Header().Set("Content-Disposition", "attachment; filename=\""+name+"\"")
 			c.Resp.Header().Set("Content-Transfer-Encoding", "binary")
